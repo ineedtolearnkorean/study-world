@@ -1,592 +1,199 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Daily Korean Study – Vocab + Scenarios + Spaced Repetition</title>
-  <style>
-    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
-    body { margin: 0; background: #f6f7fb; color: #111; }
-    header { padding: 18px 16px; background: white; border-bottom: 1px solid #e7e7ee; position: sticky; top: 0; z-index: 5; }
-    header h1 { margin: 0; font-size: 16px; }
-    header .sub { margin-top: 6px; font-size: 12px; color: #555; display:flex; gap:10px; flex-wrap:wrap; }
-    main { max-width: 980px; margin: 0 auto; padding: 16px; }
-    .grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 14px; }
-    @media (max-width: 900px){ .grid { grid-template-columns: 1fr; } }
-    .card { background: white; border: 1px solid #e7e7ee; border-radius: 12px; padding: 14px; box-shadow: 0 1px 0 rgba(0,0,0,0.03); }
-    .card h2 { margin: 0 0 10px; font-size: 14px; }
-    .row { display:flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-    input, textarea, select { width: 100%; box-sizing: border-box; border: 1px solid #d7d7e3; border-radius: 10px; padding: 10px; font-size: 14px; background: #fff; }
-    textarea { min-height: 86px; resize: vertical; }
-    button {
-      border: 1px solid #d7d7e3; background: #111; color: #fff;
-      padding: 10px 12px; border-radius: 10px; cursor: pointer; font-weight: 600;
-    }
-    button.secondary { background: white; color:#111; }
-    button.ghost { background: transparent; color:#111; }
-    button:disabled { opacity: .5; cursor: not-allowed; }
-    .pill { font-size: 12px; padding: 4px 8px; border-radius: 999px; background: #f0f1f7; border: 1px solid #e7e7ee; color:#333; }
-    .list { display:flex; flex-direction: column; gap: 10px; }
-    .item { border: 1px solid #e7e7ee; border-radius: 12px; padding: 12px; background: #fff; }
-    .item-top { display:flex; justify-content: space-between; gap: 10px; align-items: start; }
-    .word { font-size: 16px; font-weight: 800; }
-    .meaning { color: #444; font-size: 13px; margin-top: 3px; }
-    .meta { display:flex; gap: 6px; flex-wrap:wrap; margin-top: 8px; }
-    .scenario-buttons { display:flex; gap:8px; flex-wrap: wrap; margin-top: 10px; }
-    .scenario-buttons button { font-size: 12px; padding: 8px 10px; }
-    .scenario-box { margin-top: 10px; background:#fafbff; border:1px solid #e7e7ee; border-radius: 12px; padding: 10px; }
-    .k { font-size: 15px; font-weight: 750; }
-    .en { margin-top: 6px; color:#333; font-size: 13px; }
-    .breakdown { margin-top: 10px; font-size: 12px; line-height: 1.45; color:#333; }
-    .breakdown code { background:#fff; border:1px solid #e7e7ee; padding: 2px 6px; border-radius: 8px; }
-    .review { margin-top: 10px; display:flex; gap: 8px; flex-wrap:wrap; align-items: center; }
-    .review button { font-size: 12px; padding: 8px 10px; }
-    .small { font-size: 12px; color:#555; }
-    .divider { height: 1px; background: #e7e7ee; margin: 10px 0; }
-    .muted { color:#666; font-size: 12px; }
-    .danger { color:#b00020; font-weight: 700; }
-    .success { color:#0b7a0b; font-weight: 700; }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
-  </style>
+<meta charset="UTF-8">
+<title>Pink Mirah Study World</title>
+<style>
+body {
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  margin: 0;
+  background: #fff5f8;
+  color: #000;
+}
+header {
+  background: #ffc0cb;
+  padding: 15px;
+  font-weight: bold;
+  font-size: 18px;
+}
+.tabs {
+  display: flex;
+  background: #ffd6e0;
+}
+.tabs button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  background: #ffd6e0;
+  font-weight: bold;
+  cursor: pointer;
+}
+.tabs button.active {
+  background: white;
+}
+.section {
+  display: none;
+  padding: 20px;
+}
+.section.active {
+  display: block;
+}
+.card {
+  background: white;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  border: 1px solid #ffb6c1;
+}
+.word {
+  font-size: 20px;
+  font-weight: bold;
+}
+button {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #ff69b4;
+  background: #ff69b4;
+  color: white;
+  cursor: pointer;
+  margin-top: 8px;
+}
+input {
+  padding: 8px;
+  width: 100%;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  border: 1px solid #ffb6c1;
+}
+.small {
+  font-size: 13px;
+}
+</style>
 </head>
 <body>
-<header>
-  <h1>Daily Vocab — Scenarios + Sentences + Spaced Repetition</h1>
-  <div class="sub">
-    <span class="pill" id="todayPill"></span>
-    <span class="pill">Saved locally (no account)</span>
-    <span class="pill" id="duePill"></span>
-  </div>
-</header>
 
-<main>
-  <div class="grid">
-    <section class="card">
-      <h2>Today’s Review Queue</h2>
-      <div class="row" style="justify-content:space-between;">
-        <div class="muted">Pick a word → choose 1 of 3 scenarios → answer how it felt.</div>
-        <div class="row">
-          <button class="secondary" id="btnSeed">Load Starter Set</button>
-          <button class="ghost" id="btnReset">Reset Progress</button>
-        </div>
-      </div>
-      <div class="divider"></div>
-      <div id="queue" class="list"></div>
-      <div id="emptyQueue" class="muted" style="display:none;">
-        Nothing due right now 🎉 Add new words or use “Load Starter Set.”
-      </div>
-    </section>
+<header>🌸 Pink Mirah Study World</header>
 
-    <aside class="card">
-      <h2>Add / Edit Word</h2>
-      <div class="muted">Each word needs: <span class="mono">word</span>, <span class="mono">meaning</span>, and 3 scenario cards.</div>
-      <div class="divider"></div>
+<div class="tabs">
+  <button onclick="showTab('review')" class="active">Review</button>
+  <button onclick="showTab('add')">Add Word</button>
+  <button onclick="showTab('dictionary')">Dictionary</button>
+</div>
 
-      <label class="small">Word (Korean)</label>
-      <input id="inWord" placeholder="e.g., 따라오다" />
+<div id="review" class="section active"></div>
 
-      <div style="height:8px"></div>
-      <label class="small">Meaning (English)</label>
-      <input id="inMeaning" placeholder="e.g., to follow (and come), keep up" />
+<div id="add" class="section">
+  <h3>Add New Word</h3>
+  <input id="newWord" placeholder="Word (Korean)">
+  <input id="newMeaning" placeholder="Meaning (English)">
+  <button onclick="addWord()">Add with Auto Scenarios</button>
+</div>
 
-      <div style="height:10px"></div>
-      <label class="small">Grammar note (optional)</label>
-      <input id="inGrammar" placeholder="e.g., 따라오다 vs 따라가다; -(으)세요 command form" />
-
-      <div class="divider"></div>
-
-      <label class="small">Scenario 1 title</label>
-      <input id="s1Title" placeholder="e.g., Friend is walking ahead" />
-      <div style="height:8px"></div>
-      <label class="small">Scenario 1 sentence (Korean)</label>
-      <input id="s1K" placeholder="e.g., 나 따라와." />
-      <div style="height:8px"></div>
-      <label class="small">Scenario 1 English</label>
-      <input id="s1E" placeholder="e.g., Follow me." />
-      <div style="height:8px"></div>
-      <label class="small">Scenario 1 breakdown (use bullet lines)</label>
-      <textarea id="s1B" placeholder="e.g.
-- 나 = I/me
-- 따라와 = follow (me) + come (imperative)
-- 뉘앙스: casual command"></textarea>
-
-      <div class="divider"></div>
-
-      <label class="small">Scenario 2 title</label>
-      <input id="s2Title" placeholder="e.g., Dog followed you" />
-      <div style="height:8px"></div>
-      <label class="small">Scenario 2 sentence (Korean)</label>
-      <input id="s2K" placeholder="e.g., 강아지가 저를 따라왔어요." />
-      <div style="height:8px"></div>
-      <label class="small">Scenario 2 English</label>
-      <input id="s2E" placeholder="e.g., The dog followed me." />
-      <div style="height:8px"></div>
-      <label class="small">Scenario 2 breakdown</label>
-      <textarea id="s2B"></textarea>
-
-      <div class="divider"></div>
-
-      <label class="small">Scenario 3 title</label>
-      <input id="s3Title" placeholder="e.g., Keep up with the explanation" />
-      <div style="height:8px"></div>
-      <label class="small">Scenario 3 sentence (Korean)</label>
-      <input id="s3K" placeholder="e.g., 제 설명을 잘 따라오고 있어요?" />
-      <div style="height:8px"></div>
-      <label class="small">Scenario 3 English</label>
-      <input id="s3E" placeholder="e.g., Are you following my explanation?" />
-      <div style="height:8px"></div>
-      <label class="small">Scenario 3 breakdown</label>
-      <textarea id="s3B"></textarea>
-
-      <div class="divider"></div>
-
-      <div class="row">
-        <button id="btnSave">Save Word</button>
-        <button class="secondary" id="btnClear">Clear Form</button>
-      </div>
-      <div style="height:8px"></div>
-      <div class="muted" id="saveMsg"></div>
-    </aside>
-  </div>
-</main>
+<div id="dictionary" class="section">
+  <h3>English → Korean Dictionary</h3>
+  <input id="dictSearch" placeholder="Type English word..." onkeyup="searchDict()">
+  <div id="dictResults"></div>
+</div>
 
 <script>
-/* ======================
-   Data model
-   - items: array of vocab cards
-   - each card has 3 scenarios
-   - spaced repetition schedule per word
-   ====================== */
+let words = [];
+let dictionary = [
+  {eng:"overwhelmed", kor:["압도되다","벅차다","부담스럽다","정신없다"]},
+  {eng:"confident", kor:["자신감 있다","당당하다"]},
+  {eng:"tired", kor:["피곤하다","지치다"]},
+  {eng:"passion", kor:["열정"]},
+  {eng:"disappointed", kor:["실망하다"]},
+  {eng:"expect", kor:["기대하다"]},
+  {eng:"awkward", kor:["어색하다"]},
+  {eng:"used to", kor:["익숙하다"]}
+];
 
-const STORAGE_KEY = "daily_vocab_srs_v1";
-
-function todayISO() {
-  const d = new Date();
-  d.setHours(0,0,0,0);
-  return d.toISOString().slice(0,10);
-}
-function addDaysISO(iso, days) {
-  const d = new Date(iso + "T00:00:00");
-  d.setDate(d.getDate() + days);
-  return d.toISOString().slice(0,10);
-}
-
-function loadState() {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) return { items: [] };
-  try { return JSON.parse(raw); } catch { return { items: [] }; }
-}
-function saveState(state) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+function showTab(id){
+  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+  document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  event.target.classList.add("active");
 }
 
-/* Simple SM-2-ish scheduler:
-   - grade: 0..3 (Again/Hard/Good/Easy)
-   - ease starts at 2.5
-   - interval in days:
-     new word: 0 -> 1 -> 3 -> 7 -> ...
-*/
-function scheduleNext(card, grade) {
-  // grade mapping: Again=0, Hard=1, Good=2, Easy=3
-  card.reps = card.reps ?? 0;
-  card.ease = card.ease ?? 2.5;
-  card.interval = card.interval ?? 0;
-
-  if (grade === 0) {
-    // reset
-    card.reps = 0;
-    card.interval = 1;
-    card.ease = Math.max(1.3, card.ease - 0.2);
-  } else {
-    card.reps += 1;
-    if (grade === 1) card.ease = Math.max(1.3, card.ease - 0.05);
-    if (grade === 2) card.ease = Math.max(1.3, card.ease + 0.00);
-    if (grade === 3) card.ease = Math.max(1.3, card.ease + 0.10);
-
-    if (card.reps === 1) card.interval = 1;
-    else if (card.reps === 2) card.interval = 3;
-    else card.interval = Math.round(card.interval * card.ease);
-  }
-
-  const next = addDaysISO(todayISO(), Math.max(1, card.interval));
-  card.nextReview = next;
-  card.lastReviewed = todayISO();
-}
-
-function isDue(card) {
-  const due = card.nextReview ?? todayISO();
-  return due <= todayISO();
-}
-
-function uid() {
-  return Math.random().toString(16).slice(2) + "-" + Date.now().toString(16);
-}
-
-/* ======================
-   Rendering
-   ====================== */
-
-const state = loadState();
-
-const elToday = document.getElementById("todayPill");
-const elDue = document.getElementById("duePill");
-const elQueue = document.getElementById("queue");
-const elEmpty = document.getElementById("emptyQueue");
-
-elToday.textContent = "Today: " + todayISO();
-
-function render() {
-  // Sort due first, then soonest nextReview
-  const items = [...state.items].sort((a,b) => {
-    const ad = a.nextReview ?? todayISO();
-    const bd = b.nextReview ?? todayISO();
-    return ad.localeCompare(bd);
-  });
-
-  const dueItems = items.filter(isDue);
-  elDue.textContent = "Due: " + dueItems.length;
-
-  elQueue.innerHTML = "";
-  elEmpty.style.display = dueItems.length ? "none" : "block";
-
-  dueItems.forEach(card => {
-    const wrap = document.createElement("div");
-    wrap.className = "item";
-
-    const top = document.createElement("div");
-    top.className = "item-top";
-
-    const left = document.createElement("div");
-    const w = document.createElement("div");
-    w.className = "word";
-    w.textContent = card.word;
-    const m = document.createElement("div");
-    m.className = "meaning";
-    m.textContent = card.meaning || "";
-    left.appendChild(w);
-    left.appendChild(m);
-
-    const right = document.createElement("div");
-    right.style.textAlign = "right";
-    right.innerHTML = `
-      <div class="pill">Next: ${card.nextReview ?? todayISO()}</div>
-      <div class="meta" style="justify-content:flex-end;">
-        <span class="pill">reps: ${card.reps ?? 0}</span>
-        <span class="pill">ease: ${(card.ease ?? 2.5).toFixed(2)}</span>
-      </div>
-    `;
-
-    top.appendChild(left);
-    top.appendChild(right);
-
-    const meta = document.createElement("div");
-    meta.className = "meta";
-    if (card.grammar) meta.innerHTML += `<span class="pill">Grammar: ${escapeHtml(card.grammar)}</span>`;
-
-    const scenBtns = document.createElement("div");
-    scenBtns.className = "scenario-buttons";
-    (card.scenarios || []).forEach((sc, idx) => {
-      const b = document.createElement("button");
-      b.className = "secondary";
-      b.textContent = `Scenario ${idx+1}: ${sc.title}`;
-      b.addEventListener("click", () => showScenario(card.id, idx));
-      scenBtns.appendChild(b);
-    });
-
-    const scenBox = document.createElement("div");
-    scenBox.className = "scenario-box";
-    scenBox.id = `scen-${card.id}`;
-    scenBox.innerHTML = `<div class="muted">Choose a scenario above to reveal the sentence + breakdown.</div>`;
-
-    const review = document.createElement("div");
-    review.className = "review";
-    review.innerHTML = `
-      <span class="small">How did it feel?</span>
-      <button data-grade="0" class="secondary">Again</button>
-      <button data-grade="1" class="secondary">Hard</button>
-      <button data-grade="2">Good</button>
-      <button data-grade="3">Easy</button>
-      <span class="small" id="msg-${card.id}"></span>
-    `;
-
-    review.querySelectorAll("button[data-grade]").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const grade = Number(btn.getAttribute("data-grade"));
-        scheduleNext(card, grade);
-        saveState(state);
-        const msg = document.getElementById(`msg-${card.id}`);
-        msg.innerHTML = `<span class="success">Saved ✓ Next review: ${card.nextReview}</span>`;
-        // re-render after a short beat so user sees the message
-        setTimeout(render, 400);
-      });
-    });
-
-    const editRow = document.createElement("div");
-    editRow.className = "row";
-    editRow.style.marginTop = "10px";
-    const editBtn = document.createElement("button");
-    editBtn.className = "ghost";
-    editBtn.textContent = "Edit";
-    editBtn.addEventListener("click", () => loadIntoForm(card));
-    const delBtn = document.createElement("button");
-    delBtn.className = "ghost";
-    delBtn.innerHTML = `<span class="danger">Delete</span>`;
-    delBtn.addEventListener("click", () => {
-      const ok = confirm(`Delete "${card.word}"?`);
-      if (!ok) return;
-      state.items = state.items.filter(x => x.id !== card.id);
-      saveState(state);
-      render();
-    });
-    editRow.appendChild(editBtn);
-    editRow.appendChild(delBtn);
-
-    wrap.appendChild(top);
-    if (card.grammar) wrap.appendChild(meta);
-    wrap.appendChild(scenBtns);
-    wrap.appendChild(scenBox);
-    wrap.appendChild(review);
-    wrap.appendChild(editRow);
-
-    elQueue.appendChild(wrap);
-  });
-}
-
-function showScenario(cardId, idx) {
-  const card = state.items.find(x => x.id === cardId);
-  if (!card) return;
-  const sc = card.scenarios[idx];
-  const box = document.getElementById(`scen-${cardId}`);
-  if (!box) return;
-
-  box.innerHTML = `
-    <div class="pill">Context: ${escapeHtml(sc.title)}</div>
-    <div class="k" style="margin-top:8px;">${escapeHtml(sc.k)}</div>
-    <div class="en">${escapeHtml(sc.e)}</div>
-    <div class="breakdown">${formatBreakdown(sc.breakdown)}</div>
-  `;
-}
-
-function formatBreakdown(text) {
-  if (!text) return `<div class="muted">No breakdown added yet.</div>`;
-  const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
-  const items = lines.map(l => `<li>${escapeHtml(l.replace(/^-+\s?/, ""))}</li>`).join("");
-  return `<div class="small"><b>Breakdown</b></div><ul class="small" style="margin:6px 0 0 18px;">${items}</ul>`;
-}
-
-function escapeHtml(s) {
-  return String(s ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
-
-/* ======================
-   Form handling
-   ====================== */
-const inWord = document.getElementById("inWord");
-const inMeaning = document.getElementById("inMeaning");
-const inGrammar = document.getElementById("inGrammar");
-
-const s1Title = document.getElementById("s1Title");
-const s1K = document.getElementById("s1K");
-const s1E = document.getElementById("s1E");
-const s1B = document.getElementById("s1B");
-
-const s2Title = document.getElementById("s2Title");
-const s2K = document.getElementById("s2K");
-const s2E = document.getElementById("s2E");
-const s2B = document.getElementById("s2B");
-
-const s3Title = document.getElementById("s3Title");
-const s3K = document.getElementById("s3K");
-const s3E = document.getElementById("s3E");
-const s3B = document.getElementById("s3B");
-
-const btnSave = document.getElementById("btnSave");
-const btnClear = document.getElementById("btnClear");
-const saveMsg = document.getElementById("saveMsg");
-const btnSeed = document.getElementById("btnSeed");
-const btnReset = document.getElementById("btnReset");
-
-let editingId = null;
-
-function clearForm() {
-  editingId = null;
-  inWord.value = "";
-  inMeaning.value = "";
-  inGrammar.value = "";
-
-  s1Title.value = ""; s1K.value = ""; s1E.value = ""; s1B.value = "";
-  s2Title.value = ""; s2K.value = ""; s2E.value = ""; s2B.value = "";
-  s3Title.value = ""; s3K.value = ""; s3E.value = ""; s3B.value = "";
-
-  saveMsg.textContent = "";
-}
-
-function loadIntoForm(card) {
-  editingId = card.id;
-
-  inWord.value = card.word || "";
-  inMeaning.value = card.meaning || "";
-  inGrammar.value = card.grammar || "";
-
-  const sc = card.scenarios || [];
-  const a = sc[0] || {}; const b = sc[1] || {}; const c = sc[2] || {};
-  s1Title.value = a.title || ""; s1K.value = a.k || ""; s1E.value = a.e || ""; s1B.value = a.breakdown || "";
-  s2Title.value = b.title || ""; s2K.value = b.k || ""; s2E.value = b.e || ""; s2B.value = b.breakdown || "";
-  s3Title.value = c.title || ""; s3K.value = c.k || ""; s3E.value = c.e || ""; s3B.value = c.breakdown || "";
-
-  saveMsg.innerHTML = `<span class="success">Editing: ${escapeHtml(card.word)}</span>`;
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}
-
-function validateScenario(t, k, e) {
-  return (t && k && e);
-}
-
-btnSave.addEventListener("click", () => {
-  const word = inWord.value.trim();
-  const meaning = inMeaning.value.trim();
-  const grammar = inGrammar.value.trim();
-
-  const sc1 = { title: s1Title.value.trim(), k: s1K.value.trim(), e: s1E.value.trim(), breakdown: s1B.value.trim() };
-  const sc2 = { title: s2Title.value.trim(), k: s2K.value.trim(), e: s2E.value.trim(), breakdown: s2B.value.trim() };
-  const sc3 = { title: s3Title.value.trim(), k: s3K.value.trim(), e: s3E.value.trim(), breakdown: s3B.value.trim() };
-
-  if (!word || !meaning) {
-    saveMsg.innerHTML = `<span class="danger">Please enter both Word and Meaning.</span>`;
-    return;
-  }
-  if (!validateScenario(sc1.title, sc1.k, sc1.e) ||
-      !validateScenario(sc2.title, sc2.k, sc2.e) ||
-      !validateScenario(sc3.title, sc3.k, sc3.e)) {
-    saveMsg.innerHTML = `<span class="danger">Each of the 3 scenarios needs a title + Korean sentence + English line.</span>`;
-    return;
-  }
-
-  if (editingId) {
-    const existing = state.items.find(x => x.id === editingId);
-    if (!existing) {
-      saveMsg.innerHTML = `<span class="danger">Could not find the item to edit (try again).</span>`;
-      return;
-    }
-    existing.word = word;
-    existing.meaning = meaning;
-    existing.grammar = grammar;
-    existing.scenarios = [sc1, sc2, sc3];
-    saveMsg.innerHTML = `<span class="success">Updated ✓</span>`;
-  } else {
-    // avoid duplicates by word string
-    const dup = state.items.find(x => x.word === word);
-    if (dup) {
-      saveMsg.innerHTML = `<span class="danger">That word already exists. Click “Edit” on it instead.</span>`;
-      return;
-    }
-    const card = {
-      id: uid(),
-      word,
-      meaning,
-      grammar,
-      scenarios: [sc1, sc2, sc3],
-      reps: 0,
-      ease: 2.5,
-      interval: 0,
-      nextReview: todayISO(),
-      lastReviewed: null
-    };
-    state.items.push(card);
-    saveMsg.innerHTML = `<span class="success">Saved ✓ Added to today’s queue.</span>`;
-  }
-
-  saveState(state);
-  render();
-});
-
-btnClear.addEventListener("click", clearForm);
-
-btnSeed.addEventListener("click", () => {
-  if (state.items.length) {
-    const ok = confirm("Add starter words without deleting your current list?");
-    if (!ok) return;
-  }
-  const starter = [
+function generateScenarios(word){
+  return [
     {
-      id: uid(),
-      word: "따라오다",
-      meaning: "to follow (and come); to keep up (mentally)",
-      grammar: "따라가다(away) vs 따라오다(toward). Imperative: 따라와.",
-      scenarios: [
-        {
-          title: "Friend is walking ahead",
-          k: "나 따라와.",
-          e: "Follow me.",
-          breakdown: "- 나 = me\n- 따라와 = follow + come (casual imperative)\n- 뉘앙스: 친한 사이에서 자연스러움"
-        },
-        {
-          title: "A dog followed you",
-          k: "강아지가 저를 따라왔어요.",
-          e: "The dog followed me.",
-          breakdown: "- 강아지+가 = dog (subject)\n- 저+를 = me (object)\n- 따라오다 → 따라왔어요 (past, polite)"
-        },
-        {
-          title: "Keeping up with an explanation",
-          k: "제 설명을 잘 따라오고 있어요?",
-          e: "Are you following my explanation well?",
-          breakdown: "- 제 설명 = my explanation\n- 잘 = well\n- 따라오고 있어요? = are you keeping up?"
-        }
-      ],
-      reps: 0, ease: 2.5, interval: 0,
-      nextReview: todayISO(), lastReviewed: null
+      type:"Casual",
+      sentence:`요즘 ${word} 것 같아.`,
+      explanation:"Used casually in daily conversation."
     },
     {
-      id: uid(),
-      word: "따라가다",
-      meaning: "to follow (and go); to keep up",
-      grammar: "따라가다(away from here).",
-      scenarios: [
-        {
-          title: "Follow someone to a place",
-          k: "친구를 따라갔어요.",
-          e: "I followed my friend (to where they went).",
-          breakdown: "- 친구+를 = friend (object)\n- 따라가다 → 따라갔어요 (past, polite)"
-        },
-        {
-          title: "Keep up with class",
-          k: "수업을 따라가기 어려워요.",
-          e: "It’s hard to keep up with the class.",
-          breakdown: "- 수업 = class\n- -기 어렵다 = to be difficult to do\n- 따라가기 = keeping up (nominalized)"
-        },
-        {
-          title: "Follow the trend",
-          k: "유행을 따라가요.",
-          e: "I follow trends.",
-          breakdown: "- 유행 = trend\n- 따라가요 = follow/go along (present, polite)"
-        }
-      ],
-      reps: 0, ease: 2.5, interval: 0,
-      nextReview: todayISO(), lastReviewed: null
+      type:"Polite",
+      sentence:`요즘 좀 ${word} 것 같아요.`,
+      explanation:"Polite form used in normal conversation."
+    },
+    {
+      type:"Abstract",
+      sentence:`시간이 지나면서 더 ${word}졌어요.`,
+      explanation:"Used in reflective or abstract expression."
     }
   ];
-  // add only non-duplicates by word
-  starter.forEach(s => {
-    if (!state.items.find(x => x.word === s.word)) state.items.push(s);
+}
+
+function addWord(){
+  let w = document.getElementById("newWord").value;
+  let m = document.getElementById("newMeaning").value;
+  if(!w || !m) return;
+  words.push({
+    word:w,
+    meaning:m,
+    scenarios:generateScenarios(w)
   });
-  saveState(state);
-  render();
-  alert("Starter set loaded ✓");
-});
+  renderReview();
+}
 
-btnReset.addEventListener("click", () => {
-  const ok = confirm("This will erase your vocab list + review progress. Continue?");
-  if (!ok) return;
-  localStorage.removeItem(STORAGE_KEY);
-  location.reload();
-});
+function renderReview(){
+  let container = document.getElementById("review");
+  container.innerHTML="";
+  words.forEach(w=>{
+    let card=document.createElement("div");
+    card.className="card";
+    card.innerHTML=`
+      <div class="word">${w.word}</div>
+      <div class="small">${w.meaning}</div>
+      <button onclick="showScenarios('${w.word}')">Show Scenarios</button>
+      <div id="scen-${w.word}"></div>
+    `;
+    container.appendChild(card);
+  });
+}
 
-render();
+function showScenarios(word){
+  let w=words.find(x=>x.word===word);
+  let box=document.getElementById("scen-"+word);
+  box.innerHTML="";
+  w.scenarios.forEach(s=>{
+    box.innerHTML+=`
+      <div class="card">
+        <b>${s.type}</b><br>
+        ${s.sentence}<br>
+        <div class="small">${s.explanation}</div>
+      </div>
+    `;
+  });
+}
+
+function searchDict(){
+  let query=document.getElementById("dictSearch").value.toLowerCase();
+  let results=document.getElementById("dictResults");
+  results.innerHTML="";
+  dictionary.filter(d=>d.eng.includes(query)).forEach(d=>{
+    results.innerHTML+=`
+      <div class="card">
+        <b>${d.eng}</b><br>
+        ${d.kor.join(", ")}
+      </div>
+    `;
+  });
+}
+
+renderReview();
 </script>
+
 </body>
 </html>
