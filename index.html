@@ -2,197 +2,278 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Pink Mirah Study World</title>
+<title>Study World</title>
 <style>
-body {
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  margin: 0;
-  background: #fff5f8;
-  color: #000;
+:root {
+  --accent:#f6c1d0;
+  --accent-dark:#e89ab3;
+  --border:#e7e7ee;
 }
-header {
-  background: #ffc0cb;
-  padding: 15px;
-  font-weight: bold;
-  font-size: 18px;
+
+body{
+  font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;
+  margin:0;
+  background:#fafafa;
+  color:#000;
 }
-.tabs {
-  display: flex;
-  background: #ffd6e0;
+
+header{
+  padding:18px;
+  border-bottom:1px solid var(--border);
+  background:white;
+  font-weight:600;
 }
-.tabs button {
-  flex: 1;
-  padding: 12px;
-  border: none;
-  background: #ffd6e0;
-  font-weight: bold;
-  cursor: pointer;
+
+.tabs{
+  display:flex;
+  border-bottom:1px solid var(--border);
+  background:white;
 }
-.tabs button.active {
-  background: white;
+
+.tabs button{
+  flex:1;
+  padding:12px;
+  border:none;
+  background:white;
+  font-weight:600;
+  cursor:pointer;
 }
-.section {
-  display: none;
-  padding: 20px;
+
+.tabs button.active{
+  background:var(--accent);
 }
-.section.active {
-  display: block;
+
+.section{
+  display:none;
+  padding:20px;
+  max-width:1100px;
+  margin:auto;
 }
-.card {
-  background: white;
-  padding: 15px;
-  margin-bottom: 15px;
-  border-radius: 10px;
-  border: 1px solid #ffb6c1;
+
+.section.active{
+  display:block;
 }
-.word {
-  font-size: 20px;
-  font-weight: bold;
+
+.grid{
+  display:grid;
+  grid-template-columns:1.2fr .8fr;
+  gap:20px;
 }
-button {
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: 1px solid #ff69b4;
-  background: #ff69b4;
-  color: white;
-  cursor: pointer;
-  margin-top: 8px;
+
+.card{
+  background:white;
+  padding:16px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  margin-bottom:15px;
 }
-input {
-  padding: 8px;
-  width: 100%;
-  margin-bottom: 10px;
-  border-radius: 6px;
-  border: 1px solid #ffb6c1;
+
+.word{
+  font-size:20px;
+  font-weight:700;
 }
-.small {
-  font-size: 13px;
+
+.small{
+  font-size:13px;
+  color:#444;
+}
+
+button{
+  padding:8px 12px;
+  border-radius:8px;
+  border:1px solid var(--accent-dark);
+  background:var(--accent-dark);
+  color:white;
+  cursor:pointer;
+  font-weight:600;
+}
+
+button.secondary{
+  background:white;
+  color:black;
+}
+
+input{
+  padding:8px;
+  width:100%;
+  margin-bottom:10px;
+  border-radius:8px;
+  border:1px solid var(--border);
+}
+
+.scenario-box{
+  margin-top:10px;
+  padding:10px;
+  border-radius:10px;
+  background:#fff7fa;
+  border:1px solid var(--accent);
 }
 </style>
 </head>
 <body>
 
-<header>🌸 Pink Mirah Study World</header>
+<header>Study World</header>
 
 <div class="tabs">
-  <button onclick="showTab('review')" class="active">Review</button>
-  <button onclick="showTab('add')">Add Word</button>
-  <button onclick="showTab('dictionary')">Dictionary</button>
+  <button class="active" onclick="switchTab(event,'review')">Review</button>
+  <button onclick="switchTab(event,'add')">Add Word</button>
+  <button onclick="switchTab(event,'dictionary')">Dictionary</button>
 </div>
 
-<div id="review" class="section active"></div>
+<div id="review" class="section active">
+  <div class="grid">
+    <div>
+      <h3>Review Queue</h3>
+      <div id="reviewList"></div>
+    </div>
+    <div>
+      <h3>Progress</h3>
+      <div class="card">
+        <div id="stats"></div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div id="add" class="section">
-  <h3>Add New Word</h3>
+  <h3>Add Word (Auto 3 Adaptive Scenarios)</h3>
   <input id="newWord" placeholder="Word (Korean)">
   <input id="newMeaning" placeholder="Meaning (English)">
-  <button onclick="addWord()">Add with Auto Scenarios</button>
+  <button onclick="addWord()">Add Word</button>
 </div>
 
 <div id="dictionary" class="section">
-  <h3>English → Korean Dictionary</h3>
-  <input id="dictSearch" placeholder="Type English word..." onkeyup="searchDict()">
+  <h3>English → Korean</h3>
+  <input id="dictSearch" placeholder="Search English..." onkeyup="searchDict()">
   <div id="dictResults"></div>
 </div>
 
 <script>
-let words = [];
+let words = JSON.parse(localStorage.getItem("studyWords")||"[]");
+
 let dictionary = [
-  {eng:"overwhelmed", kor:["압도되다","벅차다","부담스럽다","정신없다"]},
-  {eng:"confident", kor:["자신감 있다","당당하다"]},
-  {eng:"tired", kor:["피곤하다","지치다"]},
-  {eng:"passion", kor:["열정"]},
-  {eng:"disappointed", kor:["실망하다"]},
-  {eng:"expect", kor:["기대하다"]},
-  {eng:"awkward", kor:["어색하다"]},
-  {eng:"used to", kor:["익숙하다"]}
+ {eng:"overwhelmed", kor:["압도되다","벅차다","부담스럽다","정신없다"]},
+ {eng:"confident", kor:["자신감 있다","당당하다"]},
+ {eng:"tired", kor:["피곤하다","지치다"]},
+ {eng:"passion", kor:["열정"]},
+ {eng:"awkward", kor:["어색하다"]},
+ {eng:"disappointed", kor:["실망하다"]},
+ {eng:"expect", kor:["기대하다"]},
+ {eng:"used to", kor:["익숙하다"]}
 ];
 
-function showTab(id){
-  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
-  document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-  event.target.classList.add("active");
+function switchTab(e,id){
+ document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+ document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
+ e.target.classList.add("active");
 }
 
 function generateScenarios(word){
-  return [
-    {
-      type:"Casual",
-      sentence:`요즘 ${word} 것 같아.`,
-      explanation:"Used casually in daily conversation."
-    },
-    {
-      type:"Polite",
-      sentence:`요즘 좀 ${word} 것 같아요.`,
-      explanation:"Polite form used in normal conversation."
-    },
-    {
-      type:"Abstract",
-      sentence:`시간이 지나면서 더 ${word}졌어요.`,
-      explanation:"Used in reflective or abstract expression."
-    }
-  ];
+ return [
+  {type:"Casual",
+   sentence:`요즘 좀 ${word} 것 같아.`,
+   breakdown:"Casual reflection form (-아/어). Used with friends."},
+
+  {type:"Polite",
+   sentence:`요즘 좀 ${word} 것 같아요.`,
+   breakdown:"Polite everyday form. Softened with 것 같아요."},
+
+  {type:"Abstract",
+   sentence:`시간이 지나면서 더 ${word}졌어요.`,
+   breakdown:"Reflective past transformation. -아/어지다 change structure."}
+ ];
 }
 
 function addWord(){
-  let w = document.getElementById("newWord").value;
-  let m = document.getElementById("newMeaning").value;
-  if(!w || !m) return;
-  words.push({
-    word:w,
-    meaning:m,
-    scenarios:generateScenarios(w)
-  });
-  renderReview();
+ let w=document.getElementById("newWord").value;
+ let m=document.getElementById("newMeaning").value;
+ if(!w||!m) return;
+
+ words.push({
+  word:w,
+  meaning:m,
+  scenarios:generateScenarios(w),
+  interval:1,
+  nextReview:Date.now()
+ });
+
+ save();
+ render();
 }
 
-function renderReview(){
-  let container = document.getElementById("review");
-  container.innerHTML="";
-  words.forEach(w=>{
-    let card=document.createElement("div");
-    card.className="card";
-    card.innerHTML=`
-      <div class="word">${w.word}</div>
-      <div class="small">${w.meaning}</div>
-      <button onclick="showScenarios('${w.word}')">Show Scenarios</button>
-      <div id="scen-${w.word}"></div>
-    `;
-    container.appendChild(card);
-  });
+function render(){
+ let list=document.getElementById("reviewList");
+ list.innerHTML="";
+
+ words.forEach(w=>{
+  if(Date.now()>=w.nextReview){
+   let card=document.createElement("div");
+   card.className="card";
+   card.innerHTML=`
+    <div class="word">${w.word}</div>
+    <div class="small">${w.meaning}</div>
+    <button onclick="showScenarios('${w.word}')">Choose Scenario</button>
+    <div id="scen-${w.word}"></div>
+    <button class="secondary" onclick="reviewWord('${w.word}')">Mark Reviewed</button>
+   `;
+   list.appendChild(card);
+  }
+ });
+
+ document.getElementById("stats").innerHTML=
+  `Total Words: ${words.length}`;
 }
 
 function showScenarios(word){
-  let w=words.find(x=>x.word===word);
-  let box=document.getElementById("scen-"+word);
-  box.innerHTML="";
-  w.scenarios.forEach(s=>{
-    box.innerHTML+=`
-      <div class="card">
-        <b>${s.type}</b><br>
-        ${s.sentence}<br>
-        <div class="small">${s.explanation}</div>
-      </div>
-    `;
-  });
+ let w=words.find(x=>x.word===word);
+ let box=document.getElementById("scen-"+word);
+ box.innerHTML="";
+ w.scenarios.forEach(s=>{
+  box.innerHTML+=`
+   <div class="scenario-box">
+    <b>${s.type}</b><br>
+    ${s.sentence}<br>
+    <div class="small">${s.breakdown}</div>
+   </div>
+  `;
+ });
+}
+
+function reviewWord(word){
+ let w=words.find(x=>x.word===word);
+ w.interval*=2;
+ w.nextReview=Date.now()+(w.interval*86400000);
+ save();
+ render();
 }
 
 function searchDict(){
-  let query=document.getElementById("dictSearch").value.toLowerCase();
-  let results=document.getElementById("dictResults");
-  results.innerHTML="";
-  dictionary.filter(d=>d.eng.includes(query)).forEach(d=>{
-    results.innerHTML+=`
-      <div class="card">
-        <b>${d.eng}</b><br>
-        ${d.kor.join(", ")}
-      </div>
-    `;
-  });
+ let q=document.getElementById("dictSearch").value.toLowerCase();
+ let results=document.getElementById("dictResults");
+ results.innerHTML="";
+ dictionary.filter(d=>d.eng.includes(q)).forEach(d=>{
+  results.innerHTML+=`
+   <div class="card">
+    <b>${d.eng}</b><br>
+    ${d.kor.join(", ")}<br>
+    <button onclick="quickAdd('${d.kor[0]}','${d.eng}')">Add First Option</button>
+   </div>
+  `;
+ });
 }
 
-renderReview();
+function quickAdd(k,e){
+ document.getElementById("newWord").value=k;
+ document.getElementById("newMeaning").value=e;
+ switchTab({target:document.querySelectorAll(".tabs button")[1]},"add");
+}
+
+function save(){
+ localStorage.setItem("studyWords",JSON.stringify(words));
+}
+
+render();
 </script>
 
 </body>
